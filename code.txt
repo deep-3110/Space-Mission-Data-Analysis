@@ -1,0 +1,55 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            
+                // declare CsvDataReader object which will act as a source for data for SqlBulkCopy
+                using (CsvDataReader csvData = new CsvDataReader(new StreamReader(fileUpload.PostedFile.InputStream, true)))
+                {
+                    // will read in first record as a header row and
+                    // name columns based on the values in the header row
+                    csvData.Settings.HasHeaders = true;
+
+                    // must define data types to use while parsing data
+                    csvData.Columns.Add("varchar"); // First
+                    csvData.Columns.Add("varchar"); // Last
+                    csvData.Columns.Add("datetime"); // Date
+                    csvData.Columns.Add("money"); // Amount
+
+                    // declare SqlBulkCopy object which will do the work of bringing in data from
+                    // CsvDataReader object, connecting to SQL Server, and handling all mapping
+                    // of source data to destination table.
+                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=.;Initial Catalog=Test;User ID=sa;Password="))
+                    {
+                        // set the name of the destination table that data will be inserted into.
+                        // table must already exist.
+                        bulkCopy.DestinationTableName = "Customer";
+
+                        // mappings required because we're skipping the customer_id column
+                        // and letting SQL Server handle auto incrementing of primary key.
+                        // mappings not required if order of columns is exactly the same
+                        // as destination table definition. here we use source column names that
+                        // are defined in header row in file.
+                        bulkCopy.ColumnMappings.Add("First", "first_name"); // map First to first_name
+                        bulkCopy.ColumnMappings.Add("Last", "last_name"); // map Last to last_name
+                        bulkCopy.ColumnMappings.Add("Date", "first_sale"); // map Date to first_sale
+                        bulkCopy.ColumnMappings.Add("Amount", "sale_amount"); // map Amount to sale_amount
+
+                        // call WriteToServer which starts import
+                        bulkCopy.WriteToServer(csvData);
+
+                    } // dispose of SqlBulkCopy object
+
+                } // dispose of CsvDataReader object
+
+        }
+    }
+}
