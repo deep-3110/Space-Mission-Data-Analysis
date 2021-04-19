@@ -19,15 +19,26 @@ namespace ConsoleApp1
                     csvData.Settings.HasHeaders = true;
 
                     // must define data types to use while parsing data
+            
                     csvData.Columns.Add("varchar"); // First
                     csvData.Columns.Add("varchar"); // Last
                     csvData.Columns.Add("datetime"); // Date
                     csvData.Columns.Add("money"); // Amount
+                    ---------NOTE------------
+        1.Loop through csv data
+        2.SQLQuery= "Select * from CSVData where Column1 = '" & CSVVariable1 & "' and Column2 = '" & CSVVariable2 & "' and Column3  '" & CSVVariable3 &";"
+        3.DataTable = conn.Executequery(SQLQuery)
+        4.If DataTable.Count >0 
+             add Array row in DataTable_Foundry Array
+         else 
+            Add Array row in DataTable_SBS
 
+Columns are same as CSVDAta (This will change but you start with this first) 
+        ------------------Note------
                     // declare SqlBulkCopy object which will do the work of bringing in data from
                     // CsvDataReader object, connecting to SQL Server, and handling all mapping
                     // of source data to destination table.
-                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=.;Initial Catalog=Test;User ID=sa;Password="))
+                   // using (SqlBulkCopy bulkCopy = new SqlBulkCopy("Data Source=.;Initial Catalog=Test;User ID=sa;Password="))
                     {
                         // set the name of the destination table that data will be inserted into.
                         // table must already exist.
